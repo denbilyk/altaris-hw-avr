@@ -8,6 +8,12 @@
 
 #include "avr/io.h"
 #include "uart.h"
+#include "util/delay.h"
+#include "avr/interrupt.h"
+#include "wdt_power.h"
+//#include "SPI.h"
+//#include "RF24.h"
+//#include "nRF24L01.h"
 
 void setup(void);
 

@@ -3,10 +3,8 @@
 //
 #include "uart.h"
 
-//#define F_CPU 16000000UL  // 16 MHz
-
-volatile unsigned char value;
-
+#define F_CPU 16000000UL  // 16 MHz
+#define RX_BUFF 30
 
 void UART::begin(int baudrate) {
 
@@ -17,7 +15,7 @@ void UART::begin(int baudrate) {
      * Default frame format is 8 data bits, no parity, 1 stop bit
      * to change use UCSRC, see AVR datasheet*/
     UBRR0H = (baud_prescale >> 8);
-    UCSR0B = ((1 << TXEN0) | (1 << RXEN0) | (1 << RXCIE0));
+    UCSR0B = ((1 << TXEN0) | (1 << RXEN0));
 
 }
 
@@ -28,13 +26,33 @@ size_t UART::write(uint8_t u8_data) {
     return 0;
 }
 
-uint8_t UART::receive() {
-    while ((UCSR0A & (1 << RXC0)) == 0);
-    return UDR0;
+const char *UART::readString(void) {
+    static char rxstr[RX_BUFF];
+    static char *temp;
+    temp = rxstr;
+
+    while ((*temp = readByte()) != '\n') {
+        ++temp;
+    }
+    return rxstr;
+}
+
+char UART::readByte() {
+    while (!(UCSR0A & _BV(RXC0)));
+    return (char) UDR0;
 }
 
 
-ISR(USART_RX_vect) {
-    value = UDR0;  //read UART register into value
+void UART::putByte(unsigned char data) {
+    while (!(UCSR0A & _BV(UDRE0)));
+    UDR0 = data;
+
+}
+
+void UART::writeString(char *str) {
+    while (*str != '\0') {
+        putByte(*str);
+        ++str;
+    }
 }
 

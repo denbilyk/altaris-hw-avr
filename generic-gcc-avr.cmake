@@ -166,13 +166,13 @@ function(add_avr_executable EXECUTABLE_NAME)
             ${elf_file}
             PROPERTIES
             COMPILE_FLAGS "-mmcu=${AVR_MCU}"
-            LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,--gc-sections -mrelax -Wl,-Map,${map_file_output}"
+            LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,--gc-sections -mrelax -Wl,-Map,${map_file}"
     )
 
     add_custom_command(
             OUTPUT ${hex_file}
             COMMAND
-            ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_file_output}
+            ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_file}
             COMMAND
             ${AVR_SIZE_TOOL} ${AVR_SIZE_ARGS} ${elf_file}
             DEPENDS ${elf_file}
@@ -184,7 +184,7 @@ function(add_avr_executable EXECUTABLE_NAME)
             COMMAND
             ${AVR_OBJCOPY} -j .eeprom --set-section-flags=.eeprom=alloc,load
             --change-section-lma .eeprom=0 --no-change-warnings
-            -O ihex ${elf_file} ${eeprom_file_output}
+            -O ihex ${elf_file} ${eeprom_image}
             DEPENDS ${elf_file}
     )
 
@@ -204,15 +204,21 @@ function(add_avr_executable EXECUTABLE_NAME)
     get_directory_property(clean_files ADDITIONAL_MAKE_CLEAN_FILES)
     set_directory_properties(
             PROPERTIES
-            ADDITIONAL_MAKE_CLEAN_FILES "${map_file_output};${hex_file_output};${eeprom_file_output}"
+            ADDITIONAL_MAKE_CLEAN_FILES "${map_file};${hex_file};${eeprom_image}"
     )
 
     # upload - with avrdude
     add_custom_target(
             upload_${EXECUTABLE_NAME}
-            ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} ${AVR_UPLOADTOOL_OPTIONS}
-            -U flash:w:${hex_file}
-            -P ${AVR_UPLOADTOOL_PORT}
+            ${AVR_UPLOADTOOL}
+            -C${CMAKE_CURRENT_SOURCE_DIR}/../avrdude.conf
+            -p${AVR_MCU}
+            -c${AVR_PROGRAMMER}
+            ${AVR_UPLOADTOOL_OPTIONS}
+            -b57600
+            -D
+            -Uflash:w:${hex_file}:i
+            -P${AVR_UPLOADTOOL_PORT}
             DEPENDS ${hex_file}
             COMMENT "Uploading ${hex_file} to ${AVR_MCU} using ${AVR_PROGRAMMER}"
     )
@@ -231,14 +237,27 @@ function(add_avr_executable EXECUTABLE_NAME)
     # get status
     add_custom_target(
             get_status
-            ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} -P ${AVR_UPLOADTOOL_PORT} -n -v
+            ${AVR_UPLOADTOOL}
+            -C${CMAKE_CURRENT_SOURCE_DIR}/../avrdude.conf
+            -p${AVR_MCU}
+            -c${AVR_PROGRAMMER}
+            -P${AVR_UPLOADTOOL_PORT}
+            -b57600
+            -n
+            -v
             COMMENT "Get status from ${AVR_MCU}"
     )
 
     # get fuses
     add_custom_target(
             get_fuses
-            ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} -P ${AVR_UPLOADTOOL_PORT} -n
+            ${AVR_UPLOADTOOL}
+            -p${AVR_MCU}
+            -c${AVR_PROGRAMMER}
+            -P${AVR_UPLOADTOOL_PORT}
+            -C${CMAKE_CURRENT_SOURCE_DIR}/../avrdude.conf
+            -b57600
+            -n
             -U lfuse:r:-:b
             -U hfuse:r:-:b
             COMMENT "Get fuses from ${AVR_MCU}"

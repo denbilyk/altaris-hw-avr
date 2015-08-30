@@ -13,13 +13,25 @@
 
 class UART : public Print {
 
+private:
+
+    char readByte();
+
+    void putByte(unsigned char data);
+
+
+protected:
+
+    size_t write(uint8_t u8_data);
+
+
 public:
 
     void begin(int baundrate);
 
-    size_t write(uint8_t u8_data);
+    const char *readString(void);
 
-    uint8_t receive();
+    void writeString(char *str);
 };
 
 #endif //_UART_H

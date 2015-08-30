@@ -5,7 +5,7 @@
 #include "altaris-module.h"
 
 #define DEBUG
-#define SERIAL_DELAY delay(300)
+
 
 #define CSN_PIN 10
 #define CE_PIN 9
@@ -17,21 +17,46 @@
 
 
 UART uart;
+WDT_POWER wdtPower;
+//RF24 radio(CE_PIN, CSN_PIN);
+
+void setup(void) {
+    uart.begin(9600);
+    uart.println("Init UART....");
+    uart.println("Init WDT....");
+    wdtPower.wdtInit();
+    uart.println("Init NRF24....");
+    /*radio.begin();
+    radio.setRetries(15, 15);
+    radio.setAutoAck(true);
+    radio.setDataRate(RF24_250KBPS);
+    radio.setCRCLength(RF24_CRC_8);
+    radio.openWritingPipe(WR_PIPE);
+    radio.openReadingPipe(1, RD_PIPE);
+    radio.startListening();
+    radio.printDetails();*/
+    _delay_ms(200);
+
+}
+
+void loop(void) {
+    uart.println("Available....");
+    _delay_ms(100);
+    wdtPower.sleep_for(&uart, 24);
+}
+
 
 int main(void) {
-
     setup();
-
+    sei();
     do {
         loop();
     } while (true);
 }
 
-void setup(void) {
-    uart.begin(9600);
-}
 
-void loop(void) {
-    //uart.println("Test-Test");
 
-}
+
+
+
+

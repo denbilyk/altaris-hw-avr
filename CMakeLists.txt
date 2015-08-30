@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 2.8)
 # tools to beused for programming the AVR
 ##########################################################################
 set(AVR_UPLOADTOOL avrdude)
-set(AVR_PROGRAMMER avrispmkII)
+set(AVR_PROGRAMMER arduino)
 set(AVR_UPLOADTOOL_PORT /dev/tty.ch340)
 
 ##########################################################################
@@ -87,7 +87,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 # not added automatically, since CMAKE_SYSTEM_NAME is "generic"
 set(CMAKE_SYSTEM_INCLUDE_PATH "${CMAKE_FIND_ROOT_PATH}/avr/include")
 set(CMAKE_SYSTEM_LIBRARY_PATH "${CMAKE_FIND_ROOT_PATH}/avr/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 ##########################################################################
 # status messages for generating
@@ -134,6 +134,9 @@ add_definitions("-c")
 ##########################################################################
 include_directories(${altaris-module_SOURCE_DIR}/utils)
 include_directories(${altaris-module_SOURCE_DIR}/UART)
+include_directories(${altaris-module_SOURCE_DIR}/wdt_power)
+#include_directories(${altaris-module_SOURCE_DIR}/RF24)
+#include_directories(${altaris-module_SOURCE_DIR}/SPI)
 
 ##########################################################################
 # building library and application in their subdirectories
@@ -141,6 +144,9 @@ include_directories(${altaris-module_SOURCE_DIR}/UART)
 add_subdirectory(altaris-module)
 add_subdirectory(utils)
 add_subdirectory(UART)
+add_subdirectory(wdt_power)
+#add_subdirectory(RF24)
+#add_subdirectory(SPI)
 
 ##########################################################################
 # use default documentation target
