@@ -5,7 +5,7 @@
 #ifndef _WDT_POWER_MGNT_H
 #define _WDT_POWER_MGNT_H
 
-#include "util/delay.h"
+#include "wiring.h"
 #include "avr/interrupt.h"
 #include "avr/wdt.h"
 #include "avr/sleep.h"

@@ -4,7 +4,7 @@
 
 #include "wdt_power.h"
 
-#define SERIAL_DELAY _delay_ms(300)
+#define SERIAL_DELAY delay(300)
 
 short sleep_cycles = 0;
 volatile short sleep_cycles_remain = sleep_cycles;
@@ -29,7 +29,7 @@ void WDT_POWER::wdtInit() {
     /* Enable the WD interrupt (note no reset). */
     WDTCSR |= _BV(WDIE);
 
-    _delay_ms(100);
+    delay(100);
 }
 
 void WDT_POWER::sleep_for(UART *uart, uint8_t sec) {

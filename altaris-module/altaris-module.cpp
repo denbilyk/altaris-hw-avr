@@ -18,7 +18,7 @@
 
 UART uart;
 WDT_POWER wdtPower;
-//RF24 radio(CE_PIN, CSN_PIN);
+RF24 radio(CE_PIN, CSN_PIN);
 
 void setup(void) {
     uart.begin(9600);
@@ -26,7 +26,7 @@ void setup(void) {
     uart.println("Init WDT....");
     wdtPower.wdtInit();
     uart.println("Init NRF24....");
-    /*radio.begin();
+    radio.begin();
     radio.setRetries(15, 15);
     radio.setAutoAck(true);
     radio.setDataRate(RF24_250KBPS);
@@ -34,21 +34,21 @@ void setup(void) {
     radio.openWritingPipe(WR_PIPE);
     radio.openReadingPipe(1, RD_PIPE);
     radio.startListening();
-    radio.printDetails();*/
-    _delay_ms(200);
+    radio.printDetails();
+    delay(200);
 
 }
 
 void loop(void) {
     uart.println("Available....");
-    _delay_ms(100);
+    delay(100);
     wdtPower.sleep_for(&uart, 24);
 }
 
 
 int main(void) {
+    init();
     setup();
-    sei();
     do {
         loop();
     } while (true);

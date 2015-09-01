@@ -135,8 +135,8 @@ add_definitions("-c")
 include_directories(${altaris-module_SOURCE_DIR}/utils)
 include_directories(${altaris-module_SOURCE_DIR}/UART)
 include_directories(${altaris-module_SOURCE_DIR}/wdt_power)
-#include_directories(${altaris-module_SOURCE_DIR}/RF24)
-#include_directories(${altaris-module_SOURCE_DIR}/SPI)
+include_directories(${altaris-module_SOURCE_DIR}/RF24)
+include_directories(${altaris-module_SOURCE_DIR}/SPI)
 
 ##########################################################################
 # building library and application in their subdirectories
@@ -145,8 +145,8 @@ add_subdirectory(altaris-module)
 add_subdirectory(utils)
 add_subdirectory(UART)
 add_subdirectory(wdt_power)
-#add_subdirectory(RF24)
-#add_subdirectory(SPI)
+add_subdirectory(RF24)
+add_subdirectory(SPI)
 
 ##########################################################################
 # use default documentation target

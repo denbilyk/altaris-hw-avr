@@ -15,5 +15,6 @@ target_link_libraries(
         UART-${AVR_MCU}
         utils-${AVR_MCU}
         wdt_power-${AVR_MCU}
-        #SPI-${AVR_MCU}
+        SPI-${AVR_MCU}
+        RF24-${AVR_MCU}
 )

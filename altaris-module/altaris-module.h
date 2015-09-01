@@ -7,13 +7,13 @@
 #define _ALTARIS_MODULE_H
 
 #include "avr/io.h"
-#include "uart.h"
-#include "util/delay.h"
 #include "avr/interrupt.h"
+#include "uart.h"
+#include "wiring.h"
 #include "wdt_power.h"
-//#include "SPI.h"
-//#include "RF24.h"
-//#include "nRF24L01.h"
+#include "SPI.h"
+#include "RF24.h"
+#include "nRF24L01.h"
 
 void setup(void);
 
