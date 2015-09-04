@@ -4,13 +4,6 @@
 
 #include "print.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
-// Public Methods //////////////////////////////////////////////////////////////
-
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size) {
     size_t n = 0;

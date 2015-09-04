@@ -12,8 +12,9 @@ add_avr_executable(
 #####################################################################
 target_link_libraries(
         altaris-module-${AVR_MCU}.elf
+        hw-${AVR_MCU}
         UART-${AVR_MCU}
         utils-${AVR_MCU}
         wdt_power-${AVR_MCU}
-        #SPI-${AVR_MCU}
+        rf24-${AVR_MCU}
 )
