@@ -132,6 +132,7 @@ add_definitions("-c")
 ##########################################################################
 # include search paths
 ##########################################################################
+include_directories(${altaris-module_SOURCE_DIR}/altaris-host)
 include_directories(${altaris-module_SOURCE_DIR}/utils)
 include_directories(${altaris-module_SOURCE_DIR}/UART)
 include_directories(${altaris-module_SOURCE_DIR}/wdt_power)
@@ -141,6 +142,7 @@ include_directories(${altaris-module_SOURCE_DIR}/hardware)
 ##########################################################################
 # building library and application in their subdirectories
 ##########################################################################
+add_subdirectory(altaris-host)
 add_subdirectory(altaris-module)
 add_subdirectory(utils)
 add_subdirectory(UART)

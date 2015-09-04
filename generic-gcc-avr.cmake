@@ -209,7 +209,7 @@ function(add_avr_executable EXECUTABLE_NAME)
 
     # upload - with avrdude
     add_custom_target(
-            upload_${EXECUTABLE_NAME}
+            ${EXECUTABLE_NAME}-UPLOAD
             ${AVR_UPLOADTOOL}
             -C${CMAKE_CURRENT_SOURCE_DIR}/../avrdude.conf
             -p${AVR_MCU}
@@ -226,7 +226,7 @@ function(add_avr_executable EXECUTABLE_NAME)
     # upload eeprom only - with avrdude
     # see also bug http://savannah.nongnu.org/bugs/?40142
     add_custom_target(
-            upload_eeprom
+            ${EXECUTABLE_NAME}-UPLOAD_EEPROM
             ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} ${AVR_UPLOADTOOL_OPTIONS}
             -U eeprom:w:${eeprom_image}
             -P ${AVR_UPLOADTOOL_PORT}
@@ -236,7 +236,7 @@ function(add_avr_executable EXECUTABLE_NAME)
 
     # get status
     add_custom_target(
-            get_status
+            ${EXECUTABLE_NAME}-GET_STATUS
             ${AVR_UPLOADTOOL}
             -C${CMAKE_CURRENT_SOURCE_DIR}/../avrdude.conf
             -p${AVR_MCU}
@@ -250,7 +250,7 @@ function(add_avr_executable EXECUTABLE_NAME)
 
     # get fuses
     add_custom_target(
-            get_fuses
+            ${EXECUTABLE_NAME}-GET_FUSES
             ${AVR_UPLOADTOOL}
             -p${AVR_MCU}
             -c${AVR_PROGRAMMER}
@@ -265,7 +265,7 @@ function(add_avr_executable EXECUTABLE_NAME)
 
     # set fuses
     add_custom_target(
-            set_fuses
+            ${EXECUTABLE_NAME}-SET_FUSES
             ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} -P ${AVR_UPLOADTOOL_PORT}
             -U lfuse:w:${AVR_L_FUSE}:m
             -U hfuse:w:${AVR_H_FUSE}:m
@@ -274,7 +274,7 @@ function(add_avr_executable EXECUTABLE_NAME)
 
     # get oscillator calibration
     add_custom_target(
-            get_calibration
+            ${EXECUTABLE_NAME}-GET_CALIBRAITON
             ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} -P ${AVR_UPLOADTOOL_PORT}
             -U calibration:r:${AVR_MCU}_calib.tmp:r
             COMMENT "Write calibration status of internal oscillator to ${AVR_MCU}_calib.tmp."
@@ -282,7 +282,7 @@ function(add_avr_executable EXECUTABLE_NAME)
 
     # set oscillator calibration
     add_custom_target(
-            set_calibration
+            ${EXECUTABLE_NAME}-SET_CALIBRAITON
             ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} -P ${AVR_UPLOADTOOL_PORT}
             -U calibration:w:${AVR_MCU}_calib.hex
             COMMENT "Program calibration status of internal oscillator from ${AVR_MCU}_calib.hex."
