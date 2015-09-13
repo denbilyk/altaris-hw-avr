@@ -37,18 +37,18 @@ void WDT_POWER::sleep_for(UART *uart, uint8_t sec) {
     sleep_cycles_remain = sleep_cycles;
 
     while (sleep_cycles_remain) {
-#ifdef DEBUG
         uart->print("Sleep cycle - ");
         uart->println(sleep_cycles_remain);
         SERIAL_DELAY;
-#endif
         enterSleep();
     }
     sleep_cycles_remain = sleep_cycles;
-#ifdef DEBUG
     uart->println("Sleep complete. Wake up!");
     SERIAL_DELAY;
-#endif
+}
+
+void WDT_POWER::sleep_reset() {
+    sleep_cycles_remain = 0;
 }
 
 void WDT_POWER::enterSleep() {

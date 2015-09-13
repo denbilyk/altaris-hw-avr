@@ -4,12 +4,12 @@
 
 #include "altaris-module.h"
 
-#define DEBUG
 
 #define CE D9
 #define CSN D10
 #define DS1820 D8
 #define DHT11 A0
+#define DOOR D2
 
 
 UART uart;
@@ -39,6 +39,13 @@ void setup(void) {
 
     uart.println("Init DS1820...");
     ds1820_init(DS1820);
+
+
+    /* External interrupt INT0 */
+    pinMode(DOOR, INPUT_PULLUP);
+    EICRA |= (1 << ISC01);
+    EIMSK |= (1 << INT0);
+
 
     _delay_ms(200);
 
@@ -82,18 +89,19 @@ void loop(void) {
 
     nrf(transmit_data);
 
-
+    _delay_ms(300);
     /* Or you might want to power down after TX */
-    //nrf24_powerDown();
+    nrf24_powerDown();
 
     // long adc = readVcc();
     // uart.print("ADC res : ");
     // uart.println(adc);
 
     /* Wait a little ... */
-    _delay_ms(2000);
-
-    //wdtPower.sleep_for(&uart, 24);
+    //_delay_ms(2000);
+    uart.println("Go to sleep...");
+    wdtPower.sleep_for(&uart, 24);
+    _delay_ms(500);
 }
 
 
@@ -137,6 +145,11 @@ long readVcc() {
 
     result = 1125300L / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
     return result; // Vcc in millivolts
+}
+
+ISR(INT0_vect) {
+    uart.println("INT0 interrupt...");
+    wdtPower.sleep_reset();
 }
 
 int main(void) {

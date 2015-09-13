@@ -21,6 +21,8 @@ public:
     void wdtInit();
 
     void sleep_for(UART *uart, uint8_t sec);
+
+    void sleep_reset();
 };
 
 
