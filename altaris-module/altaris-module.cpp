@@ -8,11 +8,6 @@
 
 #define CE D9
 #define CSN D10
-#define WR_PIPE_ADDR 0xE0
-#define PIPE_BASE(MSB) 0xF0F0F0F000LL + MSB
-#define WR_PIPE PIPE_BASE(WR_PIPE_ADDR)
-#define RD_PIPE PIPE_BASE(RD_PIPE_ADDR)
-#define RD_PIPE_ADDR 0xA0 //160
 
 
 UART uart;
@@ -51,13 +46,28 @@ void loop(void) {
     uart.println("Available....");
     _delay_ms(100);
 
-    nrf();
+
+    data_array[0] = 0xE7;
+
+    uint8_t temp = dht11_getTemp();
+    uint8_t humid = dht11_getHumid();
+
+    data_array[1] = temp;
+    data_array[2] = humid;
+    data_array[3] = q++;
+
+    nrf(data_array);
+
+    uart.print("Temp: ");
+    uart.println(data_array[1]);
+    uart.print("Humid: ");
+    uart.println(data_array[2]);
     /* Or you might want to power down after TX */
     //nrf24_powerDown();
 
-   // long adc = readVcc();
-   // uart.print("ADC res : ");
-   // uart.println(adc);
+    // long adc = readVcc();
+    // uart.print("ADC res : ");
+    // uart.println(adc);
 
     /* Wait a little ... */
     _delay_ms(2000);
@@ -66,11 +76,7 @@ void loop(void) {
 }
 
 
-void nrf() {
-    data_array[0] = 0x00;
-    data_array[1] = 0xAA;
-    data_array[2] = 0x55;
-    data_array[3] = q++;
+void nrf(uint8_t *data_array) {
 
     /* Automatically goes to TX mode */
     nrf24_send(data_array);

@@ -13,10 +13,11 @@
 #include "avr/interrupt.h"
 #include "wdt_power.h"
 #include "RF24.h"
+#include "dht11.h"
 
 long readVcc();
 
-void nrf() ;
+void nrf(uint8_t *data_array) ;
 
 void setup(void);
 
