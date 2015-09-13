@@ -14,6 +14,7 @@
 #include "wdt_power.h"
 #include "RF24.h"
 #include "dht11.h"
+#include "ds1820.h"
 
 long readVcc();
 

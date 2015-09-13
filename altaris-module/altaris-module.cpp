@@ -8,15 +8,16 @@
 
 #define CE D9
 #define CSN D10
+#define DS1820 D8
+#define DHT11 A0
 
 
 UART uart;
 WDT_POWER wdtPower;
 
 
-uint8_t temp;
-uint8_t q = 0;
-uint8_t data_array[4];
+uint8_t transmit_data[4];
+uint8_t dht11_data[2];
 
 uint8_t tx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
 uint8_t rx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
@@ -30,13 +31,14 @@ void setup(void) {
     uart.println("Init NRF24....");
 
     nrf24_init(CE, CSN);
-
     /* Channel #2 , payload length: 4 */
     nrf24_config(2, 4);
-
     /* Set the device addresses */
     nrf24_tx_address(tx_address);
     nrf24_rx_address(rx_address);
+
+    uart.println("Init DS1820...");
+    ds1820_init(DS1820);
 
     _delay_ms(200);
 
@@ -45,23 +47,42 @@ void setup(void) {
 void loop(void) {
     uart.println("Available....");
     _delay_ms(100);
+    transmit_data[0] = 0xE7;
 
+    uart.println("Read DHT11...");
 
-    data_array[0] = 0xE7;
-
-    uint8_t temp = dht11_getTemp();
-    uint8_t humid = dht11_getHumid();
-
-    data_array[1] = temp;
-    data_array[2] = humid;
-    data_array[3] = q++;
-
-    nrf(data_array);
-
+    bool dht11_status = dht11_read_data(DHT11, dht11_data);
+    uint8_t temp = 0;
+    uint8_t humid = 0;
+    if (dht11_status) {
+        temp = dht11_data[0];
+        humid = dht11_data[1];
+    }
+    uart.print("DHT11 reading status - ");
+    uart.println(dht11_status);
     uart.print("Temp: ");
-    uart.println(data_array[1]);
+    uart.println(temp);
     uart.print("Humid: ");
-    uart.println(data_array[2]);
+    uart.println(humid);
+
+    uart.println("Read DS1820...");
+    float ds_temp = ds1820_read_temp(DS1820);
+    uint8_t ds_temp_real = (uint8_t) ds_temp;
+    uint8_t ds_temp_fract = (uint8_t) ((ds_temp - ds_temp_real) * 1000);
+
+    uart.println("DS1820 > ");
+    uart.print(ds_temp_real);
+    uart.print(".");
+    uart.print(ds_temp_fract);
+    uart.println(" C");
+
+    transmit_data[1] = temp;
+    transmit_data[2] = humid;
+    transmit_data[3] = 44;
+
+    nrf(transmit_data);
+
+
     /* Or you might want to power down after TX */
     //nrf24_powerDown();
 
@@ -77,7 +98,7 @@ void loop(void) {
 
 
 void nrf(uint8_t *data_array) {
-
+    uint8_t temp;
     /* Automatically goes to TX mode */
     nrf24_send(data_array);
 

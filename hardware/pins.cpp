@@ -42,6 +42,12 @@ uint8_t digitalRead(uint8_t pin) {
     return check_bit(*port_o.pin, port_o.bit);
 }
 
+uint8_t digitalReadAndShift(uint8_t pin) {
+    badPin(pin);
+    port_map_t potr_o = pin_map[pin];
+    return check_bit(*potr_o.pin, potr_o.bit) >> potr_o.bit;
+
+ }
 
 //TODO: Doesnt work
 void badPin(uint8_t pin) {

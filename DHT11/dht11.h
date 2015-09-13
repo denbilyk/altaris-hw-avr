@@ -16,11 +16,6 @@ Please refer to LICENSE file for licensing information.
 #include "pins.h"
 
 
-#define DHT11 A0
-
-extern uint8_t dht11_getTemp();
-extern uint8_t dht11_getHumid();
-
-
+extern bool dht11_read_data(uint8_t used_pin, uint8_t *buffer);
 
 #endif //_DHT11_H

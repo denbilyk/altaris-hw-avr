@@ -139,6 +139,7 @@ include_directories(${altaris-module_SOURCE_DIR}/wdt_power)
 include_directories(${altaris-module_SOURCE_DIR}/RF24)
 include_directories(${altaris-module_SOURCE_DIR}/hardware)
 include_directories(${altaris-module_SOURCE_DIR}/DHT11)
+include_directories(${altaris-module_SOURCE_DIR}/DS1820)
 
 ##########################################################################
 # building library and application in their subdirectories
@@ -151,6 +152,7 @@ add_subdirectory(wdt_power)
 add_subdirectory(RF24)
 add_subdirectory(hardware)
 add_subdirectory(DHT11)
+add_subdirectory(DS1820)
 
 ##########################################################################
 # use default documentation target
