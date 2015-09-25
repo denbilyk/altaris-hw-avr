@@ -16,6 +16,8 @@ protected:
 
 public:
 
+    void flush_rx_buffer();
+
     bool available();
 
     const char *readString();

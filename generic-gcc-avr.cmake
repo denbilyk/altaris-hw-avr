@@ -227,12 +227,35 @@ function(add_avr_executable EXECUTABLE_NAME)
     # see also bug http://savannah.nongnu.org/bugs/?40142
     add_custom_target(
             ${EXECUTABLE_NAME}-UPLOAD_EEPROM
-            ${AVR_UPLOADTOOL} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} ${AVR_UPLOADTOOL_OPTIONS}
-            -U eeprom:w:${eeprom_image}
-            -P ${AVR_UPLOADTOOL_PORT}
+            ${AVR_UPLOADTOOL}
+            -C${CMAKE_CURRENT_SOURCE_DIR}/../avrdude.conf
+            -p${AVR_MCU}
+            -c${AVR_PROGRAMMER}
+            ${AVR_UPLOADTOOL_OPTIONS}
+            -b57600
+            -D
+            -Ueeprom:w:${eeprom_image}
+            -P${AVR_UPLOADTOOL_PORT}
             DEPENDS ${eeprom_image}
             COMMENT "Uploading ${eeprom_image} to ${AVR_MCU} using ${AVR_PROGRAMMER}"
     )
+
+    #read eeprom to file
+    add_custom_target(
+            ${EXECUTABLE_NAME}-READ_EEPROM
+            ${AVR_UPLOADTOOL}
+            -C${CMAKE_CURRENT_SOURCE_DIR}/../avrdude.conf
+            -p${AVR_MCU}
+            -c${AVR_PROGRAMMER}
+            ${AVR_UPLOADTOOL_OPTIONS}
+            -b57600
+            -D
+            -Ueeprom:r:/Users/denis.bilyk/Documents/eeprom.hex:i
+            -P${AVR_UPLOADTOOL_PORT}
+            DEPENDS ${eeprom_image}
+            COMMENT "Uploading ${eeprom_image} to ${AVR_MCU} using ${AVR_PROGRAMMER}"
+    )
+
 
     # get status
     add_custom_target(

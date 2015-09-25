@@ -33,3 +33,7 @@ const char *SUART::readString() {
     flush_input_buffer();
     return rxstr;
 }
+
+void SUART::flush_rx_buffer() {
+    flush_input_buffer();
+}

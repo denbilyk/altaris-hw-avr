@@ -8,6 +8,7 @@
 #include "stdint.h"
 #include "string.h"
 #include "math.h"
+#include "WString.h"
 
 
 #define DEC 10
@@ -61,6 +62,8 @@ public:
 
     size_t print(double, int = 2);
 
+    size_t print(String &);
+
     size_t println(const char[]);
 
     size_t println(char);
@@ -78,6 +81,8 @@ public:
     size_t println(double, int = 2);
 
     size_t println(void);
+
+    size_t println(String &);
 };
 
 #endif //_PRINT_H

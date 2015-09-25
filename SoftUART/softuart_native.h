@@ -53,7 +53,7 @@
 #warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
 #endif
 
-#define SOFTUART_IN_BUF_SIZE     32
+#define SOFTUART_IN_BUF_SIZE     128
 
     uint8_t rx_length();
 
