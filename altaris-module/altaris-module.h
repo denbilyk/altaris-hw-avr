@@ -8,7 +8,7 @@
 
 #include "pins.h"
 #include "avr/io.h"
-#include "uart.h"
+#include "uart_native.h"
 #include "util/delay.h"
 #include "avr/interrupt.h"
 #include "wdt_power.h"

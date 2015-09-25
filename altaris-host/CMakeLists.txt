@@ -17,4 +17,5 @@ target_link_libraries(
         utils-${AVR_MCU}
         wdt_power-${AVR_MCU}
         rf24-${AVR_MCU}
+        softuart-${AVR_MCU}
 )

@@ -9,7 +9,7 @@
 #include "avr/interrupt.h"
 #include "avr/wdt.h"
 #include "avr/sleep.h"
-#include "uart.h"
+#include "uart_native.h"
 
 class WDT_POWER {
 
@@ -20,7 +20,7 @@ private:
 public:
     void wdtInit();
 
-    void sleep_for(UART *uart, uint8_t sec);
+    void sleep_for(uint8_t sec);
 
     void sleep_reset();
 };

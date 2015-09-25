@@ -2,11 +2,11 @@
 # simple AVR library
 #####################################################################
 add_avr_library(
-        UART
-        uart_native.cpp
-        uart_native.h
-        uart.h
-        uart.cpp
+        softuart
+        softuart_native.cpp
+        softuart_native.h
+        softuart.h
+        softuart.cpp
 
 )
 

@@ -46,6 +46,8 @@ uint8_t digitalRead(uint8_t port_o);
 
 uint8_t digitalReadAndShift(uint8_t pin);
 
+long analogRead(uint8_t pin);
+
 void badPin(uint8_t pin);
 
 struct port_map_t {

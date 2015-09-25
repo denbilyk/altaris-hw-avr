@@ -9,7 +9,8 @@
 
 #define CE D9
 #define CSN D10
-
+#define SUART_TX D8
+#define SUART_RX D7
 
 uint8_t temp;
 uint8_t q = 0;
@@ -17,11 +18,12 @@ uint8_t data_array[4];
 uint8_t tx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
 uint8_t rx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
 
-
+SUART suart(SUART_TX, SUART_RX);
 UART uart;
 
 
 void setup(void) {
+
     uart.begin(9600);
     uart.println("Init UART...OK");
 
@@ -49,8 +51,18 @@ void loop(void) {
         }
     }
 
-}
+    if (suart.available()) {
+        uart.print(suart.readString());
+    }
 
+    if (uart.available()) {
+        suart.println(uart.readString());
+    }
+
+    uart.println("ACK");
+    _delay_ms(1000);
+
+}
 
 int main(void) {
     setup();

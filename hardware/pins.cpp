@@ -2,6 +2,7 @@
 // Created by Denis Bilyk on 9/2/15.
 //
 
+#include <util/delay.h>
 #include "pins.h"
 
 #define set_bit(reg, bit) reg |= (1 << bit)
@@ -47,10 +48,55 @@ uint8_t digitalReadAndShift(uint8_t pin) {
     port_map_t potr_o = pin_map[pin];
     return check_bit(*potr_o.pin, potr_o.bit) >> potr_o.bit;
 
- }
+}
+
+long analogRead(uint8_t pin) {
+    badPin(pin);
+
+    switch (pin) {
+        case A0:
+            break;
+        case A1:
+            ADMUX |= (1 << MUX0);
+            break;
+        case A2:
+            ADMUX |= (1 << MUX1);
+            break;
+        case A3:
+            ADMUX |= (1 << MUX0) | (1 << MUX1);
+            break;
+        case A4:
+            ADMUX |= (1 << MUX2);
+            break;
+        case A5:
+            ADMUX |= (1 << MUX2) | (1 << MUX0);
+            break;
+        default:
+            break;
+    }
+
+    /* Light sensor init */
+    ADMUX |= (1 << REFS0);
+    // pascale to 128
+    ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+    _delay_ms(75);
+    ADCSRA |= _BV(ADSC) | _BV(ADEN); // Start conversion
+    while (ADCSRA & (1 << ADSC)); // measuring
+
+    uint8_t low = ADCL; // must read ADCL first - it then locks ADCH
+    uint8_t high = ADCH; // unlocks both
+
+    long result = (high << 8) | low;
+    return result;
+}
 
 //TODO: Doesnt work
+/*
+void badPinNumber(void)
+        __attribute__((error("Pin number is too large or not a constant")));
+*/
 void badPin(uint8_t pin) {
     if (!__builtin_constant_p(pin) || pin >= pinCount);
-
+        //badPinNumber();
 }
+
