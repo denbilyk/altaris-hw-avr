@@ -9,8 +9,9 @@
 
 #define CE D9
 #define CSN D10
-#define SUART_TX D8
-#define SUART_RX D7
+#define SUART_TX D3
+#define SUART_RX D2
+#define CONFIGURATOR_EXISTS D8
 
 uint8_t temp;
 uint8_t q = 0;
@@ -37,6 +38,9 @@ void setup(void) {
     nrf24_tx_address(tx_address);
     nrf24_rx_address(rx_address);
 
+
+    pinMode(CONFIGURATOR_EXISTS, INPUT_PULLUP);
+
 }
 
 void loop(void) {
@@ -51,17 +55,26 @@ void loop(void) {
         }
     }
 
-    if (suart.available()) {
-        uart.print(suart.readString());
-    }
-
-    if (uart.available()) {
-        suart.println(uart.readString());
-    }
-
+    
+    isConfigMode();
     uart.println("ACK");
     _delay_ms(1000);
+}
 
+
+void isConfigMode() {
+    if (digitalReadAndShift(CONFIGURATOR_EXISTS) == 0) {
+        _delay_ms(500);
+        while (digitalReadAndShift(CONFIGURATOR_EXISTS) == 0) {
+            if (suart.available()) {
+                uart.print(suart.readString());
+            }
+
+            if (uart.available()) {
+                suart.print(uart.readString());
+            }
+        }
+    }
 }
 
 int main(void) {

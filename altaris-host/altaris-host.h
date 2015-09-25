@@ -16,5 +16,6 @@ void setup(void);
 
 void loop(void);
 
+void isConfigMode();
 //int serial_putc(char c, FILE *);
 #endif //_ALTARIS_HOST_H

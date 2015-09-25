@@ -31,7 +31,5 @@ const char *SUART::readString() {
         len--;
     }
     flush_input_buffer();
-    *temp = '\r';
-    *temp = '\n';
     return rxstr;
 }
