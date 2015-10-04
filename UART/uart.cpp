@@ -9,7 +9,7 @@ void UART::begin(int baudrate) {
     uart_init(UART_BAUD_SELECT(baudrate, F_CPU));
 }
 
-const char *UART::readString(void) {
+const char *UART::readString() {
     static char rxstr[UART_RX0_BUFFER_SIZE];
     static char *temp;
     memset(rxstr, 0, UART_RX0_BUFFER_SIZE);
@@ -22,6 +22,15 @@ const char *UART::readString(void) {
         len--;
     }
     return rxstr;
+}
+
+const char *UART::readStringUntil() {
+    uint8_t len = 0;
+    while (uart_available() > len) {
+        len = uart_available();
+        _delay_ms(100);
+    }
+    return readString();
 }
 
 bool UART::available() {

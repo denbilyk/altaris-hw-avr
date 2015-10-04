@@ -2,7 +2,6 @@
 // Created by Denis Bilyk on 9/2/15.
 //
 
-#include <util/delay.h>
 #include "pins.h"
 
 #define set_bit(reg, bit) reg |= (1 << bit)

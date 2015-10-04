@@ -24,6 +24,10 @@ public:
 
     SUART(uint8_t tx_pin, uint8_t rx_pin);
 
+    SUART();
+
+    void begin(uint8_t tx_pin, uint8_t rx_pin);
+
 };
 
 #endif //SOFTUART_H

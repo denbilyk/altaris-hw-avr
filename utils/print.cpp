@@ -61,6 +61,10 @@ size_t Print::print(String &string) {
     return print(string.c_str());
 }
 
+size_t Print::print(const String &string) {
+    return print(string.c_str());
+}
+
 size_t Print::println(void) {
     size_t n = print('\r');
     n += print('\n');
@@ -179,5 +183,9 @@ size_t Print::printFloat(double number, uint8_t digits) {
 }
 
 size_t Print::println(String &string) {
+    return println(string.c_str());
+}
+
+size_t Print::println(const String &string) {
     return println(string.c_str());
 }

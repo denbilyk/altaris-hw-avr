@@ -9,6 +9,14 @@ SUART::SUART(uint8_t tx_pin, uint8_t rx_pin) {
     init(tx_pin, rx_pin);
 }
 
+SUART::SUART() {
+
+}
+
+void SUART::begin(uint8_t tx_pin, uint8_t rx_pin) {
+    init(tx_pin, rx_pin);
+}
+
 size_t SUART::write(uint8_t u8_data) {
     putc(u8_data);
     return 0;

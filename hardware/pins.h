@@ -3,6 +3,7 @@
 
 #include "stdint.h"
 #include "avr/io.h"
+#include "util/delay.h"
 
 #define INPUT 0x00
 #define INPUT_PULLUP 0x02

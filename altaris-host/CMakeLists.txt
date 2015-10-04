@@ -5,6 +5,8 @@ add_avr_executable(
         altaris-host
         altaris-host.cpp
         altaris-host.h
+        esp-network.cpp
+        esp-network.h
 )
 
 #####################################################################

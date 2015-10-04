@@ -64,6 +64,8 @@ public:
 
     size_t print(String &);
 
+    size_t print(const String &);
+
     size_t println(const char[]);
 
     size_t println(char);
@@ -83,6 +85,8 @@ public:
     size_t println(void);
 
     size_t println(String &);
+
+    size_t println(const String &);
 };
 
 #endif //_PRINT_H

@@ -5,5 +5,7 @@ add_avr_library(
         hw
         pins.h
         pins.cpp
+        hardware.h
+        hardware.cpp
 )
 

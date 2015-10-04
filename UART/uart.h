@@ -8,6 +8,7 @@
 #include "stdint.h"
 #include "print.h"
 #include "uart_native.h"
+#include "hardware.h"
 
 
 class UART : public Print {
@@ -21,7 +22,9 @@ public:
 
     bool available();
 
-    const char *readString(void);
+    const char *readString();
+
+    const char *readStringUntil();
 
 };
 
