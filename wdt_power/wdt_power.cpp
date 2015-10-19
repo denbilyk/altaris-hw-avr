@@ -6,6 +6,7 @@
 
 #define SERIAL_DELAY _delay_ms(300)
 
+extern UART uart;
 short sleep_cycles = 0;
 volatile short sleep_cycles_remain = sleep_cycles;
 
@@ -37,13 +38,13 @@ void WDT_POWER::sleep_for(uint8_t sec) {
     sleep_cycles_remain = sleep_cycles;
 
     while (sleep_cycles_remain) {
-        uart_puts("Sleep cycle - ");
-        uart_putc(sleep_cycles_remain);
+        uart.print("Sleep cycle - ");
+        uart.println(sleep_cycles_remain);
         SERIAL_DELAY;
         enterSleep();
     }
     sleep_cycles_remain = sleep_cycles;
-    uart_puts("Sleep complete. Wake up!");
+    uart.println("Sleep complete. Wake up!");
     SERIAL_DELAY;
 }
 

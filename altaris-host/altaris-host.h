@@ -7,7 +7,7 @@
 
 #include "avr/interrupt.h"
 #include "RF24.h"
-#include "uart.h"
+#include "uart-sync.h"
 #include "esp-network.h"
 #include "util/delay.h"
 #include "WString.h"

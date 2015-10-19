@@ -35,7 +35,7 @@ void nrf24_config(uint8_t channel, uint8_t pay_length) {
     // Set length of incoming payload
     nrf24_configRegister(RX_PW_P0, 0x00); // Auto-ACK pipe ...
     nrf24_configRegister(RX_PW_P1, payload_len); // Data payload pipe
-    nrf24_configRegister(RX_PW_P2, 0x00); // Pipe not used
+    nrf24_configRegister(RX_PW_P2, payload_len); // Data payload pipe
     nrf24_configRegister(RX_PW_P3, 0x00); // Pipe not used
     nrf24_configRegister(RX_PW_P4, 0x00); // Pipe not used
     nrf24_configRegister(RX_PW_P5, 0x00); // Pipe not used
@@ -51,12 +51,12 @@ void nrf24_config(uint8_t channel, uint8_t pay_length) {
     //nrf24_configRegister(EN_AA, (1 << ENAA_P0) | (1 << ENAA_P1) | (0 << ENAA_P2) | (0 << ENAA_P3) | (0 << ENAA_P4) |
     //                            (0 << ENAA_P5));
     //TODO: turn off ack
-    nrf24_configRegister(EN_AA, (1 << ENAA_P0) | (1 << ENAA_P1) | (0 << ENAA_P2) | (0 << ENAA_P3) | (0 << ENAA_P4) |
+    nrf24_configRegister(EN_AA, (1 << ENAA_P0) | (1 << ENAA_P1) | (1 << ENAA_P2) | (0 << ENAA_P3) | (0 << ENAA_P4) |
                                 (0 << ENAA_P5));
 
     // Enable RX addresses
     nrf24_configRegister(EN_RXADDR,
-                         (1 << ERX_P0) | (1 << ERX_P1) | (0 << ERX_P2) | (0 << ERX_P3) | (0 << ERX_P4) | (0 << ERX_P5));
+                         (1 << ERX_P0) | (1 << ERX_P1) | (1 << ERX_P2) | (0 << ERX_P3) | (0 << ERX_P4) | (0 << ERX_P5));
 
     // Auto retransmit delay: 1000 us and Up to 15 retransmit trials
     nrf24_configRegister(SETUP_RETR, (0x04 << ARD) | (0x0F << ARC));
@@ -84,10 +84,17 @@ void nrf24_set_data_rate(rf24_datarate_e data_rate) {
     nrf24_configRegister(RF_SETUP, setup);
 }
 
-/* Set the RX address */
-void nrf24_rx_address(uint8_t *adr) {
+/* Set the RX address 0 */
+void nrf24_rx_address_0(uint8_t *adr) {
     nrf24_ce_digitalWrite(LOW);
     nrf24_writeRegister(RX_ADDR_P1, adr, nrf24_ADDR_LEN);
+    nrf24_ce_digitalWrite(HIGH);
+}
+
+/* Set the RX address 1 */
+void nrf24_rx_address_1(uint8_t *adr) {
+    nrf24_ce_digitalWrite(LOW);
+    nrf24_writeRegister(RX_ADDR_P2, adr, 1);
     nrf24_ce_digitalWrite(HIGH);
 }
 

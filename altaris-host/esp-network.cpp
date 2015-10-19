@@ -40,36 +40,38 @@ bool ESP::send_CIPMUX(uint8_t value) {
 }
 
 bool ESP::esp_init(String ssid, String ssid_pass) {
+    uart.println("Start init ESP...");
     if (!send_RST()) {
-        //phy_uart.println("RST - Failed");
+        uart.println("RST - Failed");
         return false;
     }
     if (!send_AT()) {
-        //phy_uart.println("AT - Failed");
+        uart.println("AT - Failed");
         return false;
     }
     if (!send_CWMODE()) {
-        //phy_uart.println("CWMODE - Failed");
+        uart.println("CWMODE - Failed");
         return false;
     }
     if (!send_CWJAP(ssid, ssid_pass)) {
-        //phy_uart.println("CWJAP - Failed");
+        uart.println("CWJAP - Failed");
         return false;
     }
     String s = send_CIPSTA();
-    //phy_uart.println(s);
+    uart.println(s);
     if (!send_CIPMUX(0)) {
-        //phy_uart.println("CIPMUX=0 = Failed");
+        uart.println("CIPMUX=0 = Failed");
         return false;
     }
     if (!send_CWMODE()) {
-        //phy_uart.println("CWMODE - Last Failed");
+        uart.println("CWMODE - Last Failed");
         return false;
     }
     if (!send_CIPMUX(1)) {
-        //phy_uart.println("CIPMUX=1 = Failed");
+        uart.println("CIPMUX=1 = Failed");
         return false;
     }
+    uart.println("ESP init complete");
     return true;
 }
 
@@ -87,12 +89,16 @@ bool connect_to_host() {
         --counter;
         suart.println(CMD_TCP_HOST);
         delay_ms(300);
-        String resp = suart.readString();
-        if (resp.indexOf("CONNECT") != -1) {
-            //uart.println("Connected!");
+        const char *resp = suart.readString();
+        if (strstr(resp, "CONNECT") != 0) {
+            uart.println("Connected!");
             is_connected = true;
             break;
+        } else {
+            uart.print("Err Res - ");
+            uart.println(resp);
         }
+
         delay_ms(1000);
     }
     return is_connected;
@@ -101,7 +107,8 @@ bool connect_to_host() {
 bool sendTcp(String tcp_packet) {
     bool res = false;
     if (connect_to_host()) {
-        //uart.println(tcp_packet);
+        uart.print("Tcp paket - ");
+        uart.println(tcp_packet);
 
         String cmd_send = String(ESP_CIPSEND);
         cmd_send.replace("{0}", String(tcp_packet.length()));
@@ -110,11 +117,12 @@ bool sendTcp(String tcp_packet) {
         String resp = suart.readString();
         if (resp.indexOf(">") != -1) {
             suart.print(tcp_packet);
-            //uart.println("Packet sent");
+            uart.println("Packet sent");
             res = true;
         } else {
             delay_ms(500);
             suart.println("AT+CIPCLOSE=0");
+            uart.print("Close - ");
             uart.println(suart.readString());
         }
     }

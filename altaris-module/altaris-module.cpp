@@ -14,9 +14,10 @@
 
 
 WDT_POWER wdtPower;
+UART uart;
 
 
-uint8_t transmit_data[4];
+uint8_t transmit_data[7];
 uint8_t dht11_data[2];
 
 uint8_t tx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
@@ -24,20 +25,21 @@ uint8_t rx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
 
 
 void setup(void) {
-    uart_init(9600);
-    uart_puts("Init UART....");
-    uart_puts("Init WDT....");
+    uart.begin(9600);
+
+    uart.println("Init UART....");
+    uart.println("Init WDT....");
     wdtPower.wdtInit();
-    uart_puts("Init NRF24....");
+    uart.println("Init NRF24....");
 
     nrf24_init(CE, CSN);
     /* Channel #2 , payload length: 4 */
-    nrf24_config(2, 4);
+    nrf24_config(2, 7);
     /* Set the device addresses */
     nrf24_tx_address(tx_address);
-    nrf24_rx_address(rx_address);
+    nrf24_rx_address_0(rx_address);
 
-    uart_puts("Init DS1820...");
+    uart.println("Init DS1820...");
     ds1820_init(DS1820);
 
 
@@ -52,11 +54,11 @@ void setup(void) {
 }
 
 void loop(void) {
-    uart_puts_ln("Available....");
+    uart.println("Available....");
     _delay_ms(100);
-    transmit_data[0] = 0xE7;
+    transmit_data[0] = tx_address[4];
 
-    uart_puts_ln("Read DHT11...");
+    uart.println("Read DHT11...");
 
     bool dht11_status = dht11_read_data(DHT11, dht11_data);
     uint8_t temp = 0;
@@ -65,32 +67,36 @@ void loop(void) {
         temp = dht11_data[0];
         humid = dht11_data[1];
     }
-    uart_puts("DHT11 reading status - ");
-    uart_puts_ln(dht11_status ? "OK" : "ERROR");
-    uart_puts("Temp: ");
-    uart_putc_ln(temp);
-    uart_puts("Humid: ");
-    uart_putc_ln(humid);
+    uart.print("DHT11 reading status - ");
+    uart.println(dht11_status ? "OK" : "ERROR");
+    uart.print("Temp: ");
+    uart.println(temp);
+    uart.print("Humid: ");
+    uart.println(humid);
 
-    uart_puts_ln("Read DS1820...");
+
+    uart.println("Read DS1820...");
     float ds_temp = ds1820_read_temp(DS1820);
     uint8_t ds_temp_real = (uint8_t) ds_temp;
     uint8_t ds_temp_fract = (uint8_t) ((ds_temp - ds_temp_real) * 1000);
 
-    uart_puts_ln("DS1820 > ");
-    uart_putc(ds_temp_real);
-    uart_puts(".");
-    uart_putc(ds_temp_fract);
-    uart_puts_ln(" C");
+    uart.print("DS1820 > ");
+    uart.print(ds_temp_real);
+    uart.print(".");
+    uart.print(ds_temp_fract);
+    uart.println(" C");
 
     long result = analogRead(LIGHT);
-    uart_puts_ln("Light sensor: ");
-    uart_putc_ln((uint8_t)result);
+    uart.print("Light sensor: ");
+    uart.println((uint8_t) result);
 
 
-    transmit_data[1] = temp;
-    transmit_data[2] = humid;
-    transmit_data[3] = 44;
+    transmit_data[1] = dht11_status ? temp : 255;
+    transmit_data[2] = dht11_status ? humid : 255;
+    transmit_data[3] = ds_temp_real;
+    transmit_data[4] = ds_temp_fract;
+    transmit_data[5] = (uint8_t) result;
+    transmit_data[6] = digitalReadAndShift(DOOR);
 
     nrf(transmit_data);
 
@@ -104,7 +110,7 @@ void loop(void) {
 
     /* Wait a little ... */
     //_delay_ms(2000);
-    uart_puts_ln("Go to sleep...");
+    uart.println("Go to sleep...");
     wdtPower.sleep_for(24);
     _delay_ms(500);
 }
@@ -122,16 +128,16 @@ void nrf(uint8_t *data_array) {
     temp = nrf24_lastMessageStatus();
 
     if (temp == NRF24_TRANSMISSON_OK) {
-        uart_puts_ln("> Tranmission went OK\r\n");
+        uart.println("> Tranmission went OK\r\n");
     }
     else if (temp == NRF24_MESSAGE_LOST) {
-        uart_puts_ln("> Message is lost ...\r\n");
+        uart.println("> Message is lost ...\r\n");
     }
 
     /* Retranmission count indicates the tranmission quality */
     temp = nrf24_retransmissionCount();
-    uart_puts("> Retranmission count: ");
-    uart_putc_ln(temp);
+    uart.print("> Retranmission count: ");
+    uart.println(temp);
 }
 
 long readVcc() {
@@ -153,7 +159,7 @@ long readVcc() {
 }
 
 ISR(INT0_vect) {
-    uart_puts_ln("INT0 interrupt...");
+    uart.println("INT0 interrupt...");
     wdtPower.sleep_reset();
 }
 

@@ -137,7 +137,7 @@ Date        Description
 	- Selective enabling of USART0,1,2,3 as required. (set in uart.h)
 ************************************************************************/
 
-#include "uart_native.h"
+#include "uart-async-native.h"
 
 /*
  *  constants and macros

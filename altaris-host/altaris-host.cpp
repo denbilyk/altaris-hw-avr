@@ -12,10 +12,12 @@
 #define SUART_TX D3
 #define SUART_RX D2
 #define CONFIGURATOR_EXISTS D8
+#define PACKET_LENGTH 7
 
-uint8_t data_array[4];
+uint8_t data_array[7];
 uint8_t tx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
 uint8_t rx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
+uint8_t rx_address_1[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE8};
 
 
 ESP esp(SUART_TX, SUART_RX);
@@ -36,36 +38,37 @@ void setup(void) {
     nrf24_init(CE, CSN);
 
     /* Channel #2 , payload length: 4 */
-    nrf24_config(2, 4);
+    nrf24_config(2, PACKET_LENGTH);
 
     /* Set the device addresses */
     nrf24_tx_address(tx_address);
-    nrf24_rx_address(rx_address);
+    nrf24_rx_address_0(rx_address);
+    nrf24_rx_address_1(rx_address_1);
 
-    pinMode(CONFIGURATOR_EXISTS, INPUT_PULLUP);
+    //pinMode(CONFIGURATOR_EXISTS, INPUT_PULLUP);
 
     readEepromData();
 
 }
 
 void loop(void) {
-    /*if (!is_esp_init) {
-        uart.println("ESP Failed!");
-    }*/
+    if (!is_esp_init) {
+        //is_esp_init = esp.esp_init("infinity", "0672086028");
+    }
 
     if (nrf24_dataReady()) {
         nrf24_getData(data_array);
         uart.println("> ");
-        for (uint8_t i = 0; i < 4; i++) {
+        for (uint8_t i = 0; i < PACKET_LENGTH; i++) {
             String tmp = String(s);
             tmp.replace("{0}", String(i));
             tmp.replace("{1}", String(data_array[i]));
             uart.println(tmp);
         }
-        //esp.send_data(uart, auth, String(data_array[0]), String(data_array[1]), String(data_array[2]));
+        //esp.send_data(auth, String(data_array[0]), String(data_array[1]), String(data_array[2]));
     }
 
-    isConfigMode();
+    //isConfigMode();
     uart.println("ACK");
     _delay_ms(1000);
 }
@@ -112,7 +115,7 @@ void writeSsidPassword(String data) {
 
 }
 
-void isConfigMode() {
+/*void isConfigMode() {
     if (digitalReadAndShift(CONFIGURATOR_EXISTS) == 0) {
         _delay_ms(500);
         while (digitalReadAndShift(CONFIGURATOR_EXISTS) == 0) {
@@ -120,7 +123,8 @@ void isConfigMode() {
                 uart.print(esp.readString());
             }
             if (uart.available()) {
-                String response = uart.readStringUntil();
+                String response = uart.readString();
+                uart.print("Res - ");
                 uart.println(response);
                 String cmd = response.substring(0, 2);
                 String data = response.substring(3);
@@ -130,11 +134,10 @@ void isConfigMode() {
                 if (cmd.equals("0B")) writeAuth(data);
                 if (cmd.equals("0S")) writeSSID(data);
                 if (cmd.equals("0P")) writeSsidPassword(data);
-                //  Not enough memory if (cmd.equals("0I")) uart.println("0I command"); //esp.esp_init(ssid, ssid_pass);
             }
         }
     }
-}
+}*/
 
 int main(void) {
     //cli();

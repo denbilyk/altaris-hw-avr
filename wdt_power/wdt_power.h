@@ -9,7 +9,7 @@
 #include "avr/interrupt.h"
 #include "avr/wdt.h"
 #include "avr/sleep.h"
-#include "uart_native.h"
+#include "uart-async.h"
 
 class WDT_POWER {
 

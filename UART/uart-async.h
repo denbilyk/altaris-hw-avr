@@ -7,7 +7,7 @@
 
 #include "stdint.h"
 #include "print.h"
-#include "uart_native.h"
+#include "uart-async-native.h"
 #include "hardware.h"
 
 
@@ -23,8 +23,6 @@ public:
     bool available();
 
     const char *readString();
-
-    const char *readStringUntil();
 
 };
 

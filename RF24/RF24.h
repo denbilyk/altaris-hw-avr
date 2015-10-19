@@ -42,7 +42,9 @@ void nrf24_set_data_rate(rf24_datarate_e data_rate);
 /* adjustment functions */
 void nrf24_init(uint8_t ce, uint8_t csn);
 
-void nrf24_rx_address(uint8_t *adr);
+void nrf24_rx_address_0(uint8_t *adr);
+
+void nrf24_rx_address_1(uint8_t *adr);
 
 void nrf24_tx_address(uint8_t *adr);
 

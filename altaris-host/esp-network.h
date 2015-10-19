@@ -8,7 +8,7 @@
 #include "stdint.h"
 #include "softuart.h"
 #include "util/delay.h"
-#include "uart.h"
+#include "uart-sync.h"
 
 const String ESP_RESP_ERROR = "ERROR";
 const String ESP_AT = "AT";
