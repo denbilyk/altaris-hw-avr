@@ -12,6 +12,8 @@ extern uint8_t door_pin;
 extern uint8_t light_pin;
 extern uint64_t tx_address;
 extern uint64_t rx_address;
+extern uint8_t green_led_pin;
+extern uint8_t red_led_pin;
 extern const char *confID;
 
 
@@ -45,6 +47,8 @@ void setup(void) {
     uart.println("Init DS1820...");
     ds1820_init(ds1820_pin);
 
+    pinMode(green_led_pin, OUTPUT);
+    pinMode(red_led_pin, OUTPUT);
 
     /* External interrupt INT0 */
     pinMode(door_pin, INPUT_PULLUP);
@@ -55,6 +59,16 @@ void setup(void) {
     uart.println(confID);
     _delay_ms(200);
 
+}
+
+void toggleLed(bool isGreen) {
+    if (isGreen) {
+        digitalWrite(green_led_pin, HIGH);
+        digitalWrite(red_led_pin, LOW);
+    } else {
+        digitalWrite(green_led_pin, LOW);
+        digitalWrite(red_led_pin, HIGH);
+    }
 }
 
 void loop(void) {
@@ -105,6 +119,7 @@ void loop(void) {
     rf24.stopListening();
     bool res = rf24.write(&transmit_data, sizeof(transmit_data));
     uart.println(res ? "> Tranmission went OK" : "> Message is lost ...");
+    toggleLed(res);
 
     _delay_ms(300);
     /* Or you might want to power down after TX */

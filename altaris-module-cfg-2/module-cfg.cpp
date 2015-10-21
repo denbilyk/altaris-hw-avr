@@ -13,6 +13,8 @@ uint8_t ds1820_pin = D8;
 uint8_t dht11_pin = A0;
 uint8_t door_pin = D2;
 uint8_t light_pin = A1;
+uint8_t green_led_pin = D3;
+uint8_t red_led_pin = D4;
 
 uint64_t rx_address = 0xE7E7E7E7E1;
 uint64_t tx_address = 0xE7E7E7E7E1;

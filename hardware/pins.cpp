@@ -23,6 +23,9 @@ void pinMode(uint8_t pin, uint8_t mode) {
     } else if (mode == INPUT_PULLUP) {
         clear_bit(*port_o.ddr, port_o.bit);
         set_bit(*port_o.port, port_o.bit);
+    } else if (mode == TRI_STATE) {
+        clear_bit(*port_o.ddr, port_o.bit);
+        clear_bit(*port_o.port, port_o.bit);
     }
 }
 
@@ -96,6 +99,6 @@ void badPinNumber(void)
 */
 void badPin(uint8_t pin) {
     if (!__builtin_constant_p(pin) || pin >= pinCount);
-        //badPinNumber();
+    //badPinNumber();
 }
 

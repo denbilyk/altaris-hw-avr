@@ -8,6 +8,7 @@
 #define INPUT 0x00
 #define INPUT_PULLUP 0x02
 #define OUTPUT 0x01
+#define TRI_STATE 0x03
 
 #ifndef HIGH
 #define HIGH 1
