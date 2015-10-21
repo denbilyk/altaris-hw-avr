@@ -146,6 +146,7 @@ include_directories(${altaris-module_SOURCE_DIR}/DS1820)
 include_directories(${altaris-module_SOURCE_DIR}/softuart)
 include_directories(${altaris-module_SOURCE_DIR}/altaris-module-cfg-1)
 include_directories(${altaris-module_SOURCE_DIR}/altaris-module-cfg-2)
+include_directories(${altaris-module_SOURCE_DIR}/RF24-Arduino)
 
 ##########################################################################
 # building library and application in their subdirectories
@@ -162,6 +163,7 @@ add_subdirectory(DS1820)
 add_subdirectory(softuart)
 add_subdirectory(altaris-module-cfg-1)
 add_subdirectory(altaris-module-cfg-2)
+add_subdirectory(RF24-Arduino)
 
 ##########################################################################
 # use default documentation target
