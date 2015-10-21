@@ -18,8 +18,6 @@
 
 long readVcc();
 
-void nrf(uint8_t *data_array) ;
-
 void setup(void);
 
 void loop(void);

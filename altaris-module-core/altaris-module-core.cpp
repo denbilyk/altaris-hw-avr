@@ -4,14 +4,6 @@
 
 #include "altaris-module-core.h"
 
-
-/*#define CE D9
-#define CSN D10
-#define DS1820 D8
-#define DHT11 A0
-#define DOOR D2
-#define LIGHT A1*/
-
 extern uint8_t ce_pin;
 extern uint8_t csn_pin;
 extern uint8_t ds1820_pin;
@@ -31,7 +23,6 @@ uint8_t transmit_data[7];
 uint8_t dht11_data[2];
 
 
-
 void setup(void) {
     uart.begin(9600);
     uart.println("Init UART....");
@@ -39,17 +30,8 @@ void setup(void) {
     wdtPower.wdtInit();
     uart.println("Init NRF24....");
 
-    //nrf24_init(ce_pin, csn_pin);
-    /* Channel #2 , payload length: 4 */
-    //nrf24_config(2, 7);
-    /* Set the device addresses */
-    //nrf24_tx_address(tx_address);
-    //nrf24_rx_address_0(rx_address);
-    //nrf24_writeRegister(RX_ADDR_P0, rx_address, nrf24_ADDR_LEN);
-    //nrf24_writeRegister(TX_ADDR, tx_address, nrf24_ADDR_LEN);
-
     rf24.begin();
-    rf24.setRetries(15,15);
+    rf24.setRetries(15, 15);
     rf24.setAutoAck(true);
     rf24.setCRCLength(RF24_CRC_8);
     rf24.setDataRate(RF24_250KBPS);
@@ -120,7 +102,9 @@ void loop(void) {
     transmit_data[5] = (uint8_t) result;
     transmit_data[6] = digitalReadAndShift(door_pin);
 
-    nrf(transmit_data);
+    rf24.stopListening();
+    bool res = rf24.write(&transmit_data, sizeof(transmit_data));
+    uart.println(res ? "> Tranmission went OK" : "> Message is lost ...");
 
     _delay_ms(300);
     /* Or you might want to power down after TX */
@@ -135,30 +119,6 @@ void loop(void) {
     uart.println("Go to sleep...");
     wdtPower.sleep_for(24);
     _delay_ms(500);
-}
-
-
-void nrf(uint8_t *data_array) {
-    //uint8_t temp;
-
-    rf24.stopListening();
-    bool res = rf24.write(data_array, sizeof(data_array));
-
-
-    /* Make analysis on last tranmission attempt */
-   // temp = nrf24_lastMessageStatus();
-
-    if (res) {
-        uart.println("> Tranmission went OK\r\n");
-    }
-    else  {
-        uart.println("> Message is lost ...\r\n");
-    }
-
-    /* Retranmission count indicates the tranmission quality */
-    //temp = rf24_retransmissionCount();
-    //uart.print("> Retranmission count: ");
-    //uart.println(temp);
 }
 
 long readVcc() {
