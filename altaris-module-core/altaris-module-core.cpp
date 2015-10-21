@@ -2,53 +2,62 @@
 // Created by Denis Bilyk on 8/22/15.
 //
 
-#include "altaris-module.h"
+#include "altaris-module-core.h"
 
 
-#define CE D9
+/*#define CE D9
 #define CSN D10
 #define DS1820 D8
 #define DHT11 A0
 #define DOOR D2
-#define LIGHT A1
+#define LIGHT A1*/
+
+extern uint8_t ce_pin;
+extern uint8_t csn_pin;
+extern uint8_t ds1820_pin;
+extern uint8_t dht11_pin;
+extern uint8_t door_pin;
+extern uint8_t light_pin;
+extern uint8_t tx_address[5];
+extern uint8_t rx_address[5];
+extern const char *confID;
 
 
 WDT_POWER wdtPower;
 UART uart;
 
-
 uint8_t transmit_data[7];
 uint8_t dht11_data[2];
 
-uint8_t tx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
-uint8_t rx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
 
 
 void setup(void) {
     uart.begin(9600);
-
     uart.println("Init UART....");
     uart.println("Init WDT....");
     wdtPower.wdtInit();
     uart.println("Init NRF24....");
 
-    nrf24_init(CE, CSN);
+    nrf24_init(ce_pin, csn_pin);
     /* Channel #2 , payload length: 4 */
     nrf24_config(2, 7);
     /* Set the device addresses */
-    nrf24_tx_address(tx_address);
-    nrf24_rx_address_0(rx_address);
+    //nrf24_tx_address(tx_address);
+    //nrf24_rx_address_0(rx_address);
+    nrf24_writeRegister(RX_ADDR_P0, rx_address, nrf24_ADDR_LEN);
+    nrf24_writeRegister(TX_ADDR, tx_address, nrf24_ADDR_LEN);
 
     uart.println("Init DS1820...");
-    ds1820_init(DS1820);
+    ds1820_init(ds1820_pin);
 
 
     /* External interrupt INT0 */
-    pinMode(DOOR, INPUT_PULLUP);
+    pinMode(door_pin, INPUT_PULLUP);
     EICRA |= (1 << ISC01);
     EIMSK |= (1 << INT0);
 
 
+    uart.println(confID);
     _delay_ms(200);
 
 }
@@ -60,7 +69,7 @@ void loop(void) {
 
     uart.println("Read DHT11...");
 
-    bool dht11_status = dht11_read_data(DHT11, dht11_data);
+    bool dht11_status = dht11_read_data(dht11_pin, dht11_data);
     uint8_t temp = 0;
     uint8_t humid = 0;
     if (dht11_status) {
@@ -76,7 +85,7 @@ void loop(void) {
 
 
     uart.println("Read DS1820...");
-    float ds_temp = ds1820_read_temp(DS1820);
+    float ds_temp = ds1820_read_temp(ds1820_pin);
     uint8_t ds_temp_real = (uint8_t) ds_temp;
     uint8_t ds_temp_fract = (uint8_t) ((ds_temp - ds_temp_real) * 1000);
 
@@ -86,7 +95,7 @@ void loop(void) {
     uart.print(ds_temp_fract);
     uart.println(" C");
 
-    long result = analogRead(LIGHT);
+    long result = analogRead(light_pin);
     uart.print("Light sensor: ");
     uart.println((uint8_t) result);
 
@@ -96,7 +105,7 @@ void loop(void) {
     transmit_data[3] = ds_temp_real;
     transmit_data[4] = ds_temp_fract;
     transmit_data[5] = (uint8_t) result;
-    transmit_data[6] = digitalReadAndShift(DOOR);
+    transmit_data[6] = digitalReadAndShift(door_pin);
 
     nrf(transmit_data);
 

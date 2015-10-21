@@ -15,9 +15,8 @@
 #define PACKET_LENGTH 7
 
 uint8_t data_array[7];
-uint8_t tx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
-uint8_t rx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
-uint8_t rx_address_1[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE8};
+uint8_t rx_address_0[5] = {0x27, 0x27, 0x27, 0x27, 0xE0};
+uint8_t rx_address_1[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE1};
 
 
 ESP esp(SUART_TX, SUART_RX);
@@ -41,9 +40,11 @@ void setup(void) {
     nrf24_config(2, PACKET_LENGTH);
 
     /* Set the device addresses */
-    nrf24_tx_address(tx_address);
-    nrf24_rx_address_0(rx_address);
-    nrf24_rx_address_1(rx_address_1);
+    //nrf24_tx_address(tx_address);
+    //nrf24_rx_address_0(rx_address_0);
+    //nrf24_rx_address_1(rx_address_1);
+    nrf24_writeRegister(RX_ADDR_P0, rx_address_0, nrf24_ADDR_LEN);
+    nrf24_writeRegister(RX_ADDR_P1, rx_address_1, nrf24_ADDR_LEN);
 
     //pinMode(CONFIGURATOR_EXISTS, INPUT_PULLUP);
 

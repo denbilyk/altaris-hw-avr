@@ -2,16 +2,16 @@
 # simple AVR executable
 #####################################################################
 add_avr_executable(
-        altaris-module
-        altaris-module.cpp
-        altaris-module.h
+        module-cfg-2
+        module-cfg.cpp
 )
 
 #####################################################################
 # libraries to link to
 #####################################################################
 target_link_libraries(
-        altaris-module-${AVR_MCU}.elf
+        module-cfg-2-${AVR_MCU}.elf
+        altaris-module-core-${AVR_MCU}
         hw-${AVR_MCU}
         UART-${AVR_MCU}
         utils-${AVR_MCU}

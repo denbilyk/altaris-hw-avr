@@ -37,7 +37,7 @@ include(generic-gcc-avr.cmake)
 ##########################################################################
 # name your project
 ##########################################################################
-project(altaris-module)
+project(altaris)
 
 ##########################################################################
 # status messages
@@ -128,11 +128,14 @@ add_definitions("-funsigned-char")
 add_definitions("-funsigned-bitfields")
 add_definitions("-ffunction-sections")
 add_definitions("-c")
+add_definitions("-g")
+add_definitions("-std=c++11")
 
 ##########################################################################
 # include search paths
 ##########################################################################
 include_directories(${altaris-module_SOURCE_DIR}/altaris-host)
+include_directories(${altaris-module_SOURCE_DIR}/altaris-module-core)
 include_directories(${altaris-module_SOURCE_DIR}/utils)
 include_directories(${altaris-module_SOURCE_DIR}/UART)
 include_directories(${altaris-module_SOURCE_DIR}/wdt_power)
@@ -141,12 +144,14 @@ include_directories(${altaris-module_SOURCE_DIR}/hardware)
 include_directories(${altaris-module_SOURCE_DIR}/DHT11)
 include_directories(${altaris-module_SOURCE_DIR}/DS1820)
 include_directories(${altaris-module_SOURCE_DIR}/softuart)
+include_directories(${altaris-module_SOURCE_DIR}/altaris-module-cfg-1)
+include_directories(${altaris-module_SOURCE_DIR}/altaris-module-cfg-2)
 
 ##########################################################################
 # building library and application in their subdirectories
 ##########################################################################
 add_subdirectory(altaris-host)
-add_subdirectory(altaris-module)
+add_subdirectory(altaris-module-core)
 add_subdirectory(utils)
 add_subdirectory(UART)
 add_subdirectory(wdt_power)
@@ -155,6 +160,8 @@ add_subdirectory(hardware)
 add_subdirectory(DHT11)
 add_subdirectory(DS1820)
 add_subdirectory(softuart)
+add_subdirectory(altaris-module-cfg-1)
+add_subdirectory(altaris-module-cfg-2)
 
 ##########################################################################
 # use default documentation target
