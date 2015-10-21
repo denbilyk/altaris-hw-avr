@@ -14,6 +14,6 @@ uint8_t dht11_pin = A0;
 uint8_t door_pin = D2;
 uint8_t light_pin = A1;
 
-uint8_t rx_address[5] = {0x27, 0x27, 0x27, 0x27, 0xE0};
-uint8_t tx_address[5] = {0x27, 0x27, 0x27, 0x27, 0xE0};
+uint64_t rx_address = 0x27272727E0;
+uint64_t tx_address = 0x27272727E0;
 const char *confID = "Configuration ID: 0xE0";

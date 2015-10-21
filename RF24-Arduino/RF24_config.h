@@ -9,18 +9,19 @@
 
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
+#define ARDUINO 200
 
 #if ARDUINO < 100
 #include <WProgram.h>
 #else
-#include <Arduino.h>
+//#include <Arduino.h>
 #endif
 
 #include <stddef.h>
 
 // Stuff that is normally provided by Arduino
 #ifdef ARDUINO
-#include <SPI.h>
+//#include <SPI.h>
 #else
 #include <stdint.h>
 #include <stdio.h>
@@ -57,7 +58,7 @@ typedef uint16_t prog_uint16_t;
 #define printf_P printf
 #define strlen_P strlen
 #define PROGMEM
-#define pgm_read_word(p) (*(p)) 
+#define pgm_read_word(p) (*(p))
 #define PRIPSTR "%s"
 #endif
 

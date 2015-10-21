@@ -18,13 +18,14 @@ extern uint8_t ds1820_pin;
 extern uint8_t dht11_pin;
 extern uint8_t door_pin;
 extern uint8_t light_pin;
-extern uint8_t tx_address[5];
-extern uint8_t rx_address[5];
+extern uint64_t tx_address;
+extern uint64_t rx_address;
 extern const char *confID;
 
 
 WDT_POWER wdtPower;
 UART uart;
+RF24 rf24(ce_pin, csn_pin);
 
 uint8_t transmit_data[7];
 uint8_t dht11_data[2];
@@ -38,14 +39,26 @@ void setup(void) {
     wdtPower.wdtInit();
     uart.println("Init NRF24....");
 
-    nrf24_init(ce_pin, csn_pin);
+    //nrf24_init(ce_pin, csn_pin);
     /* Channel #2 , payload length: 4 */
-    nrf24_config(2, 7);
+    //nrf24_config(2, 7);
     /* Set the device addresses */
     //nrf24_tx_address(tx_address);
     //nrf24_rx_address_0(rx_address);
-    nrf24_writeRegister(RX_ADDR_P0, rx_address, nrf24_ADDR_LEN);
-    nrf24_writeRegister(TX_ADDR, tx_address, nrf24_ADDR_LEN);
+    //nrf24_writeRegister(RX_ADDR_P0, rx_address, nrf24_ADDR_LEN);
+    //nrf24_writeRegister(TX_ADDR, tx_address, nrf24_ADDR_LEN);
+
+    rf24.begin();
+    rf24.setRetries(15,15);
+    rf24.setAutoAck(true);
+    rf24.setCRCLength(RF24_CRC_8);
+    rf24.setDataRate(RF24_250KBPS);
+
+    rf24.openWritingPipe(tx_address);
+    rf24.openReadingPipe(0, rx_address);
+
+    rf24.printDetails();
+
 
     uart.println("Init DS1820...");
     ds1820_init(ds1820_pin);
@@ -65,7 +78,7 @@ void setup(void) {
 void loop(void) {
     uart.println("Available....");
     _delay_ms(100);
-    transmit_data[0] = tx_address[4];
+    transmit_data[0] = tx_address & 0xff;
 
     uart.println("Read DHT11...");
 
@@ -111,7 +124,7 @@ void loop(void) {
 
     _delay_ms(300);
     /* Or you might want to power down after TX */
-    nrf24_powerDown();
+    rf24.powerDown();
 
     // long adc = readVcc();
     // uart.print("ADC res : ");
@@ -126,27 +139,26 @@ void loop(void) {
 
 
 void nrf(uint8_t *data_array) {
-    uint8_t temp;
-    /* Automatically goes to TX mode */
-    nrf24_send(data_array);
+    //uint8_t temp;
 
-    /* Wait for transmission to end */
-    while (nrf24_isSending());
+    rf24.stopListening();
+    bool res = rf24.write(data_array, sizeof(data_array));
+
 
     /* Make analysis on last tranmission attempt */
-    temp = nrf24_lastMessageStatus();
+   // temp = nrf24_lastMessageStatus();
 
-    if (temp == NRF24_TRANSMISSON_OK) {
+    if (res) {
         uart.println("> Tranmission went OK\r\n");
     }
-    else if (temp == NRF24_MESSAGE_LOST) {
+    else  {
         uart.println("> Message is lost ...\r\n");
     }
 
     /* Retranmission count indicates the tranmission quality */
-    temp = nrf24_retransmissionCount();
-    uart.print("> Retranmission count: ");
-    uart.println(temp);
+    //temp = rf24_retransmissionCount();
+    //uart.print("> Retranmission count: ");
+    //uart.println(temp);
 }
 
 long readVcc() {

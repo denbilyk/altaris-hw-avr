@@ -6,11 +6,17 @@
  version 2 as published by the Free Software Foundation.
  */
 
+#include <stdio.h>
+#include <uart-sync.h>
+#include "avr/pgmspace.h"
 #include "nRF24L01-arduino.h"
 #include "RF24_config.h"
 #include "RF24-arduino.h"
 #include "pins.h"
+#include "binary.h"
 
+
+extern UART uart;
 /****************************************************************************/
 
 void RF24::csn(int mode)
@@ -19,11 +25,14 @@ void RF24::csn(int mode)
   // If we assume 2Mbs data rate and 16Mhz clock, a
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+
+/*  ========= using soft spi ===========
 #ifdef ARDUINO
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
   SPI.setClockDivider(SPI_CLOCK_DIV4);
 #endif
+*/
   digitalWrite(csn_pin,mode);
 }
 
@@ -41,9 +50,9 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   uint8_t status;
 
   csn(LOW);
-  status = SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
+  status = spi_transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
-    *buf++ = SPI.transfer(0xff);
+    *buf++ = spi_transfer(0xff);
 
   csn(HIGH);
 
@@ -55,8 +64,8 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 uint8_t RF24::read_register(uint8_t reg)
 {
   csn(LOW);
-  SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
-  uint8_t result = SPI.transfer(0xff);
+  spi_transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
+  uint8_t result = spi_transfer(0xff);
 
   csn(HIGH);
   return result;
@@ -69,9 +78,9 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   uint8_t status;
 
   csn(LOW);
-  status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
+  status = spi_transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
-    SPI.transfer(*buf++);
+    spi_transfer(*buf++);
 
   csn(HIGH);
 
@@ -87,8 +96,8 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"),reg,value));
 
   csn(LOW);
-  status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
-  SPI.transfer(value);
+  status = spi_transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
+  spi_transfer(value);
   csn(HIGH);
 
   return status;
@@ -108,11 +117,11 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
   //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
   
   csn(LOW);
-  status = SPI.transfer( W_TX_PAYLOAD );
+  status = spi_transfer( W_TX_PAYLOAD );
   while ( data_len-- )
-    SPI.transfer(*current++);
+    spi_transfer(*current++);
   while ( blank_len-- )
-    SPI.transfer(0);
+    spi_transfer(0);
   csn(HIGH);
 
   return status;
@@ -131,11 +140,11 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
   
   csn(LOW);
-  status = SPI.transfer( R_RX_PAYLOAD );
+  status = spi_transfer( R_RX_PAYLOAD );
   while ( data_len-- )
-    *current++ = SPI.transfer(0xff);
+    *current++ = spi_transfer(0xff);
   while ( blank_len-- )
-    SPI.transfer(0xff);
+    spi_transfer(0xff);
   csn(HIGH);
 
   return status;
@@ -148,7 +157,7 @@ uint8_t RF24::flush_rx(void)
   uint8_t status;
 
   csn(LOW);
-  status = SPI.transfer( FLUSH_RX );
+  status = spi_transfer( FLUSH_RX );
   csn(HIGH);
 
   return status;
@@ -161,7 +170,7 @@ uint8_t RF24::flush_tx(void)
   uint8_t status;
 
   csn(LOW);
-  status = SPI.transfer( FLUSH_TX );
+  status = spi_transfer( FLUSH_TX );
   csn(HIGH);
 
   return status;
@@ -174,7 +183,7 @@ uint8_t RF24::get_status(void)
   uint8_t status;
 
   csn(LOW);
-  status = SPI.transfer( NOP );
+  status = spi_transfer( NOP );
   csn(HIGH);
 
   return status;
@@ -334,11 +343,15 @@ void RF24::printDetails(void)
 void RF24::begin(void)
 {
   // Initialize pins
-  pinMode(ce_pin,OUTPUT);
-  pinMode(csn_pin,OUTPUT);
+
+  // ======== In spi_begin() =======
+  //pinMode(ce_pin,OUTPUT);
+  //pinMode(csn_pin,OUTPUT);
 
   // Initialize SPI bus
-  SPI.begin();
+  spi_begin(ce_pin, csn_pin);
+  // Begin printf
+  printf_begin();
 
   ce(LOW);
   csn(HIGH);
@@ -349,7 +362,7 @@ void RF24::begin(void)
   // Enabling 16b CRC is by far the most obvious case if the wrong timing is used - or skipped.
   // Technically we require 4.5ms + 14us as a worst case. We'll just call it 5ms for good measure.
   // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
-  delay( 5 ) ;
+  _delay_ms( 5 ) ;
 
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
@@ -411,7 +424,7 @@ void RF24::startListening(void)
   ce(HIGH);
 
   // wait for the radio to come up (130us actually only needed)
-  delayMicroseconds(130);
+  _delay_us(130);
 }
 
 /****************************************************************************/
@@ -459,14 +472,14 @@ bool RF24::write( const void* buf, uint8_t len )
   // Monitor the send
   uint8_t observe_tx;
   uint8_t status;
-  uint32_t sent_at = millis();
-  const uint32_t timeout = 500; //ms to wait for timeout
+  //uint32_t sent_at = millis();
+  //const uint32_t timeout = 500; //ms to wait for timeout
   do
   {
     status = read_register(OBSERVE_TX,&observe_tx,1);
     IF_SERIAL_DEBUG(Serial.print(observe_tx,HEX));
   }
-  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( millis() - sent_at < timeout ) );
+  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) /*&& ( millis() - sent_at < timeout )*/ );
 
   // The part above is what you could recreate with your own interrupt handler,
   // and then call this when you got an interrupt
@@ -509,14 +522,14 @@ void RF24::startWrite( const void* buf, uint8_t len )
 {
   // Transmitter power-up
   write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
-  delayMicroseconds(150);
+  _delay_us(150);
 
   // Send the payload
   write_payload( buf, len );
 
   // Allons!
   ce(HIGH);
-  delayMicroseconds(15);
+  _delay_us(15);
   ce(LOW);
 }
 
@@ -527,8 +540,8 @@ uint8_t RF24::getDynamicPayloadSize(void)
   uint8_t result = 0;
 
   csn(LOW);
-  SPI.transfer( R_RX_PL_WID );
-  result = SPI.transfer(0xff);
+  spi_transfer( R_RX_PL_WID );
+  result = spi_transfer(0xff);
   csn(HIGH);
 
   return result;
@@ -659,8 +672,8 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
 void RF24::toggle_features(void)
 {
   csn(LOW);
-  SPI.transfer( ACTIVATE );
-  SPI.transfer( 0x73 );
+  spi_transfer( ACTIVATE );
+  spi_transfer( 0x73 );
   csn(HIGH);
 }
 
@@ -724,11 +737,11 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
   csn(LOW);
-  SPI.transfer( W_ACK_PAYLOAD | ( pipe & B111 ) );
+  spi_transfer( W_ACK_PAYLOAD | ( pipe & B111 ) );
   const uint8_t max_payload_size = 32;
   uint8_t data_len = min(len,max_payload_size);
   while ( data_len-- )
-    SPI.transfer(*current++);
+    spi_transfer(*current++);
 
   csn(HIGH);
 }
@@ -980,6 +993,55 @@ void RF24::disableCRC( void )
 void RF24::setRetries(uint8_t delay, uint8_t count)
 {
  write_register(SETUP_RETR,(delay&0xf)<<ARD | (count&0xf)<<ARC);
+}
+
+uint8_t RF24::spi_transfer(uint8_t tx) {
+  uint8_t i = 0;
+  uint8_t rx = 0;
+
+  digitalWrite(SCK, LOW);
+
+  for (i = 0; i < 8; i++) {
+
+    if (tx & (1 << (7 - i))) {
+      digitalWrite(MOSI, HIGH);
+    }
+    else {
+      digitalWrite(MOSI, LOW);
+    }
+
+    digitalWrite(SCK, HIGH);
+
+    rx = rx << 1;
+    if (digitalRead(MISO)) {
+      rx |= 0x01;
+    }
+
+    digitalWrite(SCK, LOW);
+
+  }
+
+  return rx;
+}
+
+void RF24::spi_begin(uint8_t ce_pin, uint8_t csn_pin){
+  pinMode(ce_pin, OUTPUT);
+  pinMode(csn_pin, OUTPUT);
+  pinMode(SCK, OUTPUT);
+  pinMode(MOSI, OUTPUT);
+  pinMode(MISO, INPUT);
+}
+
+
+int serial_putc( char c, FILE * )
+{
+  uart.print( c );
+  return c;
+}
+
+void RF24::printf_begin(void)
+{
+  fdevopen( &serial_putc, 0 );
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp

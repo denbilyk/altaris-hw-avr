@@ -17,6 +17,8 @@
 
 #include <RF24_config.h>
 
+#define min(a,b) ((a)<(b)?(a):(b))
+
 /**
  * Power Amplifier level.
  *
@@ -55,6 +57,9 @@ private:
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
 
+    uint8_t spi_transfer(uint8_t tx);
+    void spi_begin(uint8_t ce_pin, uint8_t csn_pin);
+    void printf_begin(void);
 protected:
   /**
    * @name Low-level internal interface.

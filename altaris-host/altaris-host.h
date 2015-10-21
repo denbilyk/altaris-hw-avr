@@ -6,7 +6,7 @@
 #define _ALTARIS_HOST_H
 
 #include "avr/interrupt.h"
-#include "RF24.h"
+#include "RF24-arduino.h"
 #include "uart-sync.h"
 #include "esp-network.h"
 #include "util/delay.h"

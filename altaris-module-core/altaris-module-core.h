@@ -12,7 +12,7 @@
 #include "util/delay.h"
 #include "avr/interrupt.h"
 #include "wdt_power.h"
-#include "RF24.h"
+#include "RF24-arduino.h"
 #include "dht11.h"
 #include "ds1820.h"
 
