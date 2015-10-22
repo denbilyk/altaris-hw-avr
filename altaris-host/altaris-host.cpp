@@ -12,7 +12,6 @@
 #define SUART_TX D3
 #define SUART_RX D2
 #define CONFIGURATOR_EXISTS D8
-#define PACKET_LENGTH 7
 
 #define RX_ADDR_0 0x27272727E0
 #define RX_ADDR_1 0xE7E7E7E7E1
@@ -22,13 +21,13 @@
 #define RX_ADDR_5 0xE7E7E7E7E5
 
 
-uint8_t data_array[7];
+uint16_t received_data[6];
 
 ESP esp(SUART_TX, SUART_RX);
 UART uart;
 RF24 rf24(CE, CSN);
 
-const String s = "data_array[{0}] = {1}";
+const String s = "received_data[{0}] = {1}";
 bool is_esp_init = false;
 String ssid = "";
 String ssid_pass = "";
@@ -69,16 +68,16 @@ void loop(void) {
     if (rf24.available()) {
         bool done = false;
         while (!done) {
-            done = rf24.read(&data_array, PACKET_LENGTH);
+            done = rf24.read(&received_data, sizeof(received_data));
         }
         uart.println("> ");
-        for (uint8_t i = 0; i < PACKET_LENGTH; i++) {
+        for (uint8_t i = 0; i < 6; i++) {
             String tmp = String(s);
             tmp.replace("{0}", String(i));
-            tmp.replace("{1}", String(data_array[i]));
+            tmp.replace("{1}", String(received_data[i]));
             uart.println(tmp);
         }
-        //esp.send_data(auth, String(data_array[0]), String(data_array[1]), String(data_array[2]));
+        //esp.send_data(auth, String(received_data[0]), String(received_data[1]), String(received_data[2]));
     }
 
     //isConfigMode();

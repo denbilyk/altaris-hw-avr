@@ -18,6 +18,8 @@
 
 long readVcc();
 
+long readLight();
+
 void setup(void);
 
 void loop(void);

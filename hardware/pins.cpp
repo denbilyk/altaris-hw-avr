@@ -54,6 +54,8 @@ uint8_t digitalReadAndShift(uint8_t pin) {
 
 long analogRead(uint8_t pin) {
     badPin(pin);
+    ADMUX = 0x00;
+    ADCSRA = 0x00;
 
     switch (pin) {
         case A0:
