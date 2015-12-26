@@ -33,7 +33,7 @@ void WDT_POWER::wdtInit() {
     _delay_ms(100);
 }
 
-void WDT_POWER::sleep_for(uint8_t sec) {
+void WDT_POWER::sleep_for(uint16_t sec) {
     sleep_cycles = (short) (sec / 8);
     sleep_cycles_remain = sleep_cycles;
 

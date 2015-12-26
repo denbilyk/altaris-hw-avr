@@ -170,6 +170,7 @@ ISR(INT0_vect) {
 }
 
 int main(void) {
+    init_hardware();
     setup();
     sei();
     do {

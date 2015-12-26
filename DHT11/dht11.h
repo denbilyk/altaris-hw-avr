@@ -14,6 +14,7 @@ Please refer to LICENSE file for licensing information.
 #include "avr/io.h"
 #include "util/delay.h"
 #include "pins.h"
+#include "hardware.h"
 
 
 extern bool dht11_read_data(uint8_t used_pin, uint8_t *buffer);

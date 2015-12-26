@@ -20,7 +20,7 @@ private:
 public:
     void wdtInit();
 
-    void sleep_for(uint8_t sec);
+    void sleep_for(uint16_t sec);
 
     void sleep_reset();
 };
