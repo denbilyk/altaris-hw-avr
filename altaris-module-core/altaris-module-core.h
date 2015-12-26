@@ -16,9 +16,15 @@
 #include "dht11.h"
 #include "ds1820.h"
 
-long readVcc();
+uint16_t readVcc();
 
 long readLight();
+
+void init_ctl_pins();
+
+void startDevice(uint8_t pin, int delay);
+
+void stopDevice(uint8_t pin);
 
 void setup(void);
 

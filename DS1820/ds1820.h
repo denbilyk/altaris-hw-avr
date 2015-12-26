@@ -29,6 +29,9 @@
 #include "util/delay.h"
 #include "pins.h"
 
+#define TEMP_LSB        0
+#define TEMP_MSB        1
+
 //-----------------------------------------
 // Prototypes
 //-----------------------------------------
@@ -42,8 +45,10 @@ uint8_t ds1820_re_byte(uint8_t);
 
 void ds1820_wr_byte(uint8_t, uint8_t);
 
-float ds1820_read_temp(uint8_t);
+int16_t ds1820_read_temp(uint8_t);
 
 void ds1820_init(uint8_t);
+
+float rawToCelsius(int16_t raw);
 
 #endif //_DS1820_H

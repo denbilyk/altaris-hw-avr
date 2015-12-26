@@ -110,11 +110,10 @@ void ds1820_wr_byte(uint8_t wrbyte, uint8_t used_pin) {
 //-----------------------------------------
 // Read temperature
 //-----------------------------------------
-float ds1820_read_temp(uint8_t used_pin) {
+int16_t ds1820_read_temp(uint8_t used_pin) {
     uint8_t error, i;
     uint16_t j = 0;
     uint8_t scratchpad[9];
-    float temp = 0;
     scratchpad[0] = 0;
     scratchpad[1] = 0;
     scratchpad[2] = 0;
@@ -141,25 +140,27 @@ float ds1820_read_temp(uint8_t used_pin) {
             scratchpad[i] = ds1820_re_byte(used_pin);                    //9. read one DS18S20 byte
         }
     }
-    if (scratchpad[1] == 0x00 && scratchpad[7] != 0) {                    //Value pos.
-        scratchpad[0] = scratchpad[0] >> 1;
-        temp = (scratchpad[0] - 0.25f + (((float) scratchpad[7] - (float) scratchpad[6]) / (float) scratchpad[7]));
-        temp = (floor(temp * 10.0 + 0.5) / 10);                            //Round value .x
 
+    int16_t fpTemperature =
+            (((int16_t) scratchpad[TEMP_MSB]) << 11) |
+            (((int16_t) scratchpad[TEMP_LSB]) << 3);
+
+    //TODO: check conversion on real ds18s20
+    /*
+    if (deviceAddress[0] == DS18S20MODEL) {
+        fpTemperature = ((fpTemperature & 0xfff0) << 3) - 16 +
+                        (
+                                ((scratchPad[COUNT_PER_C] - scratchPad[COUNT_REMAIN]) << 7) /
+                                scratchPad[COUNT_PER_C]
+                        );
     }
-    if (scratchpad[1] != 0x00) {                                        //Value negative
-        uint8_t tmp;
-        tmp = scratchpad[0];                                            //Save Kommabit
-        tmp = ~tmp;
-        tmp = tmp >> 1;
-        temp = (-1) * (tmp + 1);
-        if ((scratchpad[0] & 0x01) == 1) {
-            temp = temp + 0.5;
-        }
+     */
 
-    }
+    return fpTemperature;
+}
 
-    return temp;
+float rawToCelsius(int16_t raw) {
+    return (float) raw * 0.0078125;
 }
 
 //-----------------------------------------

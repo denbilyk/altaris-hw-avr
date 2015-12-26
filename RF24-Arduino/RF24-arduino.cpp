@@ -478,7 +478,7 @@ bool RF24::write( const void* buf, uint8_t len )
   {
     status = read_register(OBSERVE_TX,&observe_tx,1);
     IF_SERIAL_DEBUG(Serial.print(observe_tx,HEX));
-  }
+  } //TODO: implement timeout
   while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) /*&& ( millis() - sent_at < timeout )*/ );
 
   // The part above is what you could recreate with your own interrupt handler,
