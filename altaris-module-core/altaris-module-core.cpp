@@ -134,7 +134,7 @@ void loop(void) {
     transmit_data[5] = batVcc;
 
     rf24.stopListening();
-    bool res = false; //rf24.write(&transmit_data, sizeof(transmit_data));
+    bool res = rf24.write(&transmit_data, sizeof(transmit_data));
     uart.println(res ? "> Tranmission went OK" : "> Message is lost ...");
 
     rf24.powerDown();
